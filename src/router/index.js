@@ -1,15 +1,30 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Login from './views/login'
-import Home from './views/home'
+import Login from '../views/login'
+import Home from '../views/home'
+import Welcome from '../views/home/welcome'
+import Users from '../views/home/users'
 
 Vue.use(Router)
 
 const router = new Router({
+  // 定义路由规则
   routes: [
+    // 定义根路径重定向
     { path: '/', redirect: '/login' },
+    // 定义登陆路由规则
     { path: '/login', component: Login },
-    { path: '/home', component: Home }
+    // 定义hom路由规则
+    {
+      path: '/home',
+      component: Home,
+      redirect: '/welcome',
+      children: [
+        { path: '/welcome', component: Welcome },
+        { path: '/users', component: Users }
+      ]
+    }
+
   ]
 })
 
