@@ -3,7 +3,7 @@
     <div class="login-box">
       <!-- 头像区域 -->
       <div class="avatar-box">
-        <img src="./魔术棒.jpg" alt="">
+        <img src="./头像.jpg" alt="">
       </div>
       <!-- 登录表单区域 -->
       <el-form ref="logFormRef" class="login-form" :model="loginForm" :rules="loginFormRules" label-width="0px" >
@@ -73,12 +73,13 @@ export default {
 <style lang="less" scoped>
   .login{
     height: 100%;
-    background: #2b4b6b;
+    background:url('./背景图.jpg') no-repeat;
+    background-position: center;
 
   .login-box{
       width: 450px;
       height: 300px;
-      background-color: #fff;
+      background-color: #43647c66;
       border-radius: 3px;
       position: absolute;
       left: 50%;

@@ -15,7 +15,7 @@
         <!-- 侧边栏区域 -->
         <div class="toggle-button" @click="toggle">|||</div>
         <el-menu
-          background-color="#373d41"
+          background-color="#001D26"
           text-color="#fff"
           active-text-color="#409EEF"
           unique-opened
@@ -111,14 +111,14 @@ export default {
   height: 100%;
 }
 .el-header {
-  background-color: #373d41;
+  background-color: #001d26;
   display: flex;
   justify-content: space-between;
   padding-left: 0;
   align-items: center;
   color: #fff;
   font-size: 20px;
-  > div {
+  div {
     display: flex;
     align-items: center;
     span {
@@ -128,7 +128,7 @@ export default {
 }
 
 .el-aside {
-  background-color: #333744;
+  background-color: #001d26;
   .el-menu {
     border-right: none;
   }
@@ -141,7 +141,7 @@ export default {
   margin-right: 10px;
 }
 .toggle-button {
-  background-color: #4a5064;
+  background-color: #08485f;
   text-align: center;
   color: #fff;
   line-height: 24px;
