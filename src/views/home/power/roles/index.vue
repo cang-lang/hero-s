@@ -11,7 +11,7 @@
       <!-- 添加角色按钮区域 -->
       <el-row>
         <el-col>
-          <el-button type="primary">创建角色</el-button>
+          <el-button type="primary">添加分类</el-button>
         </el-col>
       </el-row>
 
