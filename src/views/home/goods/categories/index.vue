@@ -64,8 +64,17 @@
         <el-form-item label="分类名称" prop="cat_name">
           <el-input v-model="addCateForm.cat_name"></el-input>
         </el-form-item>
-        <el-form-item label="选择分类">
-
+        <el-form-item label="父级分类">
+              <!-- options用来绑定数据源 -->
+              <!-- props用来指定配置对潒 -->
+              <el-cascader
+                expand-trigger="hover"
+                :options="ParentCateList"
+                :props="cascaderProps"
+                v-model="selectedKeys"
+                @change="parentCateChanged"
+                clearable change-on-select
+              ></el-cascader>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -123,9 +132,19 @@ export default {
       addCaterules: {
         cat_name: [
           { required: true, message: '请输入分类名称', trigger: 'blur' },
-          { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+          { min: 1, max: 5, message: '长度在 1 到 5 个字符', trigger: 'blur' }
         ]
-      }
+      },
+      // 父级分类的列表
+      ParentCateList: [],
+      // 指定级联选择器的配置对象
+      cascaderProps: {
+        value: '"cat_id',
+        label: 'cat_name',
+        children: 'children'
+      },
+      // 选中的父级分类的id数组
+      selectedKeys: []
     }
   },
   created () {
@@ -155,13 +174,28 @@ export default {
     },
     // 点击按钮，控制添加分类的显示与隐藏
     showCatedialogVisible () {
+      this.getParentCateList()
       this.addCatedialogVisible = true
+    },
+    // 获取父级分类的数据列表
+    async  getParentCateList () {
+      const { data: { data, meta } } = await this.$http.get('categories', { params: { type: 2 } })
+      if (meta.status !== 200) return this.$message.error('获取数据失败')
+      this.ParentCateList = data
+      console.log(data)
+    },
+    // 选择项发生变化触发这个函数
+    parentCateChanged () {
+      console.log(this.selectedKeys)
     }
   }
 }
 </script>
 <style lang="less" scoped>
 .zk-table {
-  margin: 15px 0
+  margin: 15px 0;
+}
+.el-cascader{
+  width: 100%;
 }
 </style>
