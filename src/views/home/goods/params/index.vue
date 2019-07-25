@@ -40,8 +40,35 @@
           >添加参数</el-button>
           <!-- 动态参数表格 -->
           <el-table :data="manyTableDate" border stripe>
-            <!-- 展开行 -->
-            <el-table-column type="expand"></el-table-column>
+            <!-- 展开行 作用域插槽 -->
+            <el-table-column type="expand">
+              <template slot-scope="scope">
+                <!-- 循环渲染Tag标签 -->
+                <el-tag
+                  v-for="(item,i) in scope.row.attr_vals"
+                  :key="i"
+                  closable
+                  @close="handleClose(i,scope.row)"
+                >{{item}}</el-tag>
+                <!-- 输入文本框 -->
+                <el-input
+                  class="input-new-tag"
+                  v-if="scope.row.inputVisible"
+                  v-model="scope.row.inputValue"
+                  ref="saveTagInput"
+                  size="small"
+                  @keyup.enter.native="handleInputConfirm(scope.row)"
+                  @blur="handleInputConfirm(scope.row)"
+                ></el-input>
+                <!-- 添加按钮 -->
+                <el-button
+                  v-else
+                  class="button-new-tag"
+                  size="small"
+                  @click="showInput(scope.row)"
+                >+ New Tag</el-button>
+              </template>
+            </el-table-column>
             <!-- 索引列 -->
             <el-table-column prop="attr_name" type="index"></el-table-column>
             <el-table-column prop="attr_name" label="参数名称"></el-table-column>
@@ -75,7 +102,35 @@
           <!-- 静态属性表格 -->
           <el-table :data="onlyTableDate" border stripe>
             <!-- 展开行 -->
-            <el-table-column type="expand"></el-table-column>
+            <el-table-column type="expand">
+              <template slot-scope="scope">
+                <!-- 循环渲染Tag标签 -->
+                <el-tag
+                  v-for="(item,i) in scope.row.attr_vals"
+                  :key="i"
+                  closable
+                  @close="handleClose(i,scope.row)"
+                >{{item}}</el-tag>
+                <!-- 输入文本框 -->
+                <el-input
+                  class="input-new-tag"
+                  v-if="scope.row.inputVisible"
+                  v-model="scope.row.inputValue"
+                  ref="saveTagInput"
+                  size="small"
+                  @keyup.enter.native="handleInputConfirm(scope.row)"
+                  @blur="handleInputConfirm(scope.row)"
+                ></el-input>
+                <!-- 添加按钮 -->
+                <el-button
+                  v-else
+                  class="button-new-tag"
+                  size="small"
+                  @click="showInput(scope.row)"
+                >+ New Tag</el-button>
+              </template>
+            </el-table-column>
+
             <!-- 索引列 -->
             <el-table-column prop="attr_name" type="index"></el-table-column>
             <el-table-column prop="attr_name" label="属性名称"></el-table-column>
@@ -87,7 +142,12 @@
                   icon="el-icon-edit"
                   @click="showEidtDialogVisible(scope.row.attr_id)"
                 >修改</el-button>
-                <el-button size="mini" type="warning" icon="el-icon-delete"  @click="removeParams(scope.row.attr_id)">删除</el-button>
+                <el-button
+                  size="mini"
+                  type="warning"
+                  icon="el-icon-delete"
+                  @click="removeParams(scope.row.attr_id)"
+                >删除</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -203,9 +263,9 @@ export default {
     // 动态计算标题文本
     titleText () {
       if (this.activeName === 'many') {
-        return '动态参数'
+        return '动态参数';
       } else {
-        return '静态属性'
+        return '静态属性';
       }
     }
   },
@@ -217,7 +277,7 @@ export default {
       } = await this.$http.get('categories')
       if (meta.status !== 200) return this.$message.error('获取商品分类失败')
       this.cateList = data
-      // console.log(this.cateList)
+      // console.log(data)
     },
     // 级联选择框选中项变化，会触发这个函数
     handleChange () {
@@ -225,17 +285,19 @@ export default {
     },
     // tab页签点击事件的处理函数
     handleClick () {
-      console.log(this.activeName)
+      // console.log(this.activeName)
       this.getParamsDate()
     },
     // 获取参数列表数据
     async getParamsDate () {
       if (this.selectedCateKeys.length !== 3) {
         this.selectedCateKeys = []
-        return
+        this.manyTableDate = []
+        this.onlyTableDate = []
+        return;
       }
       // 证明选中的是三级分类
-      console.log(this.selectedCateKeys)
+      // console.log(this.selectedCateKeys)
       // 根据所选分类的id和所处的面板，获取对应的数据
       const {
         data: { data, meta }
@@ -243,7 +305,14 @@ export default {
         params: { sel: this.activeName }
       })
       if (meta.status !== 200) return this.$message.error('获取参数列表失败')
-      // console.log(data)
+      console.log(data)
+      data.forEach(item => {
+        item.attr_vals = item.attr_vals ? item.attr_vals.split(' ') : []
+        // 控制文本的显示与隐藏
+        item.inputVisible = false
+        item.inputValue = '';
+      })
+      // 判断并购i不同的，选择 赋值
       if (this.activeName === 'many') {
         this.manyTableDate = data
       } else {
@@ -277,7 +346,7 @@ export default {
         this.addDialogVisible = false
         this.getParamsDate()
       })
-      console.log(this.$refs.addFormRef)
+      // console.log(this.$refs.addFormRef)
     },
     // 控制修改参数框的显示与隐藏
     async showEidtDialogVisible (attr_id) {
@@ -338,6 +407,49 @@ export default {
       } catch (error) {
         this.$message.info('已取消删除')
       }
+    },
+    // 文本框失去了焦点或者按下enter键都会触发的函数
+    async handleInputConfirm (row) {
+      if (row.inputValue.trim().length === 0) {
+        row.inputValue = '';
+        row.inputVisible = false
+        return;
+      }
+      // 如果没有return 则书写了合法的内容
+      row.attr_vals.push(row.inputValue.trim())
+      row.inputValue = '';
+      row.inputVisible = false
+      // 同时，需要发送请求更新数据
+      this.saveAttrvals(row)
+    },
+    // 点击按钮，展示文本输入框
+    showInput (row) {
+      row.inputVisible = true
+      // 让文本框自动获得焦点
+      this.$nextTick(_ => {
+        this.$refs.saveTagInput.$refs.input.focus()
+      })
+    },
+    // 将对attr—vals的操作，保存到数据库
+    async saveAttrvals (row) {
+      const {
+        data: { data, meta }
+      } = await this.$http.put(
+        `categories/${this.cateID}/attributes/${row.attr_id}`,
+        {
+          attr_name: row.attr_name,
+          attr_sel: row.attr_sel,
+          attr_vals: row.attr_vals.join(' ')
+        }
+      )
+      if (meta.status !== 200) return this.$message.error('编辑参数失败')
+      this.$message.success('增加参数成功')
+    },
+    // 点击删除
+    handleClose (i, row) {
+      row.attr_vals.splice(i, 1)
+      // 跟新到数据库
+      this.saveAttrvals(row)
     }
   }
 }
@@ -345,5 +457,11 @@ export default {
 <style lang="less" scoped>
 .el-alert {
   margin-bottom: 15px;
+}
+.el-tag {
+  margin: 15px;
+}
+.input-new-tag {
+  width: 120px;
 }
 </style>

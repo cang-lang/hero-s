@@ -65,16 +65,16 @@
           <el-input v-model="addCateForm.cat_name"></el-input>
         </el-form-item>
         <el-form-item label="父级分类">
-              <!-- options用来绑定数据源 -->
-              <!-- props用来指定配置对潒 -->
-              <el-cascader
-                expand-trigger="hover"
-                :options="ParentCateList"
-                :props="cascaderProps"
-                v-model="selectedKeys"
-                @change="parentCateChanged"
-                clearable change-on-select
-              ></el-cascader>
+          <!-- options用来绑定数据源 -->
+          <!-- props用来指定配置对潒 -->
+          <el-cascader
+            expand-trigger="hover"
+            :options="ParentCateList"
+            :props="cascaderProps"
+            v-model="selectedKeys"
+            @change="parentCateChanged"
+            clearable
+          ></el-cascader>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -178,11 +178,13 @@ export default {
       this.addCatedialogVisible = true
     },
     // 获取父级分类的数据列表
-    async  getParentCateList () {
-      const { data: { data, meta } } = await this.$http.get('categories', { params: { type: 2 } })
+    async getParentCateList () {
+      const {
+        data: { data, meta }
+      } = await this.$http.get('categories', { params: { type: 2 } })
       if (meta.status !== 200) return this.$message.error('获取数据失败')
       this.ParentCateList = data
-      console.log(data)
+      console.log(this.ParentCateList)
     },
     // 选择项发生变化触发这个函数
     parentCateChanged () {
@@ -195,7 +197,7 @@ export default {
 .zk-table {
   margin: 15px 0;
 }
-.el-cascader{
+.el-cascader {
   width: 100%;
 }
 </style>
